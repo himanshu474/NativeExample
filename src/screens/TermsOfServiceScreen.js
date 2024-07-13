@@ -30,11 +30,7 @@ Failure in clearing payments or delay in transfer from client’s account can le
 Users’ are requested to go through the Terms and Conditions of company’s Refund Policy before availing any service.
       </Text>
       <Text style={styles.paragraph}>
-      4. Our Compulsion
-Myitronline Global Services Private Limited does not take any liabilities for any losses caused by lack of information provided by you.
-The company is not liable for any delay caused by the Indian IT department in processing your Income Tax Forms or Income Tax Refund.
-We work as per the Privacy Policy that is defined to strictly safeguard client’s confidentiality and company’s security that a user should go through carefully.
-Myitronline Global Services Private Limited reserves right the make changes in Terms of Services without prior notification, clients will receive notification once such modification
+        
       </Text>
     </ScrollView>
   );
