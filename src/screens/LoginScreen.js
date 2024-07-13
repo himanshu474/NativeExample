@@ -13,9 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { colors } from "../utlis/colors";
-import TermsOfServiceScreen from "./TermsOfServiceScreen"; // Import policy screens
-// import CookiePolicyScreen from "./CookiePolicyScreen";
-// Import other policy screens as needed
+import TermsOfServiceScreen from "./TermsOfServiceScreen";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -24,8 +22,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [loading, setLoading] = useState(false); // New state for loading indicator
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState("");
 
@@ -52,17 +49,15 @@ const LoginScreen = () => {
       return;
     }
 
-    setIsLoading(true);
+    setLoading(true); // Start loading indicator
 
+    // Simulate login process
     setTimeout(() => {
-      setIsLoading(false);
-      setIsProcessing(true);
+      setLoading(false); // Stop loading indicator
 
-      setTimeout(() => {
-        setIsProcessing(false);
-        navigation.navigate("MainApp");
-      }, 1);
-    }, 1);
+      // Navigate to main app or handle error
+      navigation.navigate("MainApp");
+    }, 2000); // Simulating 2 seconds of loading time
   };
 
   const validateEmail = (email) => {
@@ -177,20 +172,10 @@ const LoginScreen = () => {
         </View>
       </Modal>
 
-      {isLoading && (
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={isProcessing}
-          onRequestClose={() => setIsProcessing(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalText}>Please wait...</Text>
-              <ActivityIndicator size="large" color={colors.primary} />
-            </View>
-          </View>
-        </Modal>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
       )}
     </View>
   );
@@ -295,17 +280,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
   },
-  modalContent: {
-    backgroundColor: colors.white,
-    padding: 20,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalText: {
-    marginTop: 10,
-    fontSize: 16,
-    fontFamily: "Roboto",
+  closeModalButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
+    zIndex: 100,
   },
   termsContainer: {
     alignItems: "flex-start",
@@ -323,18 +303,11 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     marginHorizontal: 5,
   },
-  closeModalButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 10,
-    zIndex: 100,
-  },
-  closeModalText: {
-    color: colors.primary,
-    fontSize: 18,
-    marginTop: 10,
-    textDecorationLine: "underline",
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
