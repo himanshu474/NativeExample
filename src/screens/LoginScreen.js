@@ -157,7 +157,7 @@ const LoginScreen = () => {
             <Text style={styles.signupText}>Sign up</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </View> 
 
       <Modal
         animationType="slide"
@@ -173,8 +173,7 @@ const LoginScreen = () => {
             <Ionicons name="close-circle-outline" size={36} color={colors.primary} />
           </TouchableOpacity>
           {selectedPolicy === "TermsOfService" && <TermsOfServiceScreen />}
-          {selectedPolicy === "CookiePolicy" && <CookiePolicyScreen />}
-          {/* Render other policy screens as needed */}
+          {/* {selectedPolicy === "CookiePolicy" && <CookiePolicyScreen />} */}
         </View>
       </Modal>
 
