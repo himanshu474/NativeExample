@@ -57,7 +57,7 @@ const LoginScreen = () => {
 
       // Navigate to main app or handle error
       navigation.navigate("MainApp");
-    }, 2000); // Simulating 2 seconds of loading time
+    }, 5); // Simulating 5 milliseconds of loading time
   };
 
   const validateEmail = (email) => {
