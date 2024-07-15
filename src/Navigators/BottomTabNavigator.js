@@ -12,10 +12,14 @@ const BottomTabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         activeTintColor: colors.primary,
-        inactiveTintColor: colors.secondary,
+        inactiveTintColor: colors.blue,
         labelStyle: {
           fontSize: 16,
           fontFamily: "Roboto",
+        },
+        style:{
+          borderTopWidth:1,
+          borderTopColor:colors.secondary,
         },
       }}
     >
