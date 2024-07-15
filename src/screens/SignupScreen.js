@@ -11,6 +11,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../utlis/colors";
+import { signup } from "../api/apiService";
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -18,12 +19,10 @@ const SignupScreen = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState({
     fullName: "",
     email: "",
     password: "",
-    phone: "",
   });
 
   const handleGoBack = () => {
@@ -34,7 +33,7 @@ const SignupScreen = () => {
     navigation.navigate("LOGIN");
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     let formIsValid = true;
     const newErrors = {
       fullName: "",
@@ -42,19 +41,26 @@ const SignupScreen = () => {
       password: "",
     };
 
+    // Validate full name
     if (!fullName.trim()) {
       newErrors.fullName = "Full Name is required";
       formIsValid = false;
+    } else if (!/^[a-zA-Z\s]*$/.test(fullName.trim())) {
+      newErrors.fullName =
+        "Full Name should not contain numbers or special characters";
+      formIsValid = false;
     }
 
+    // Validate email
     if (!email.trim()) {
       newErrors.email = "Email is required";
       formIsValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Invalid email address";
+          }else if (!/^[a-zA-Z0-9._%+-]+@(gmail|hotmail)\.(com|in)$/.test(email)) {
+            newErrors.email = "Email is invalid";
       formIsValid = false;
     }
 
+    // Validate password
     if (!password.trim()) {
       newErrors.password = "Password is required";
       formIsValid = false;
@@ -63,28 +69,33 @@ const SignupScreen = () => {
       formIsValid = false;
     }
 
-   
-
     setErrors(newErrors);
- 
+
     if (formIsValid) {
-
-      navigation.navigate("LOGIN");
-
-      console.log("Form is valid, signing up...");
-
-      
-      setFullName("");
-      setEmail("");
-      setPassword("");
-    
+      try {
+        await signup(fullName, email, password);
+        navigation.navigate("LOGIN"); // Navigate to login screen after successful signup
+        setFullName("");
+        setEmail("");
+        setPassword("");
+      } catch (error) {
+        console.error('Signup error:', error);
+        // Handle signup error (e.g., display error message)
+      }
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButtonWrapper} onPress={handleGoBack}>
-        <Ionicons name={"arrow-back-outline"} color={colors.primary} size={25} />
+      <TouchableOpacity
+        style={styles.backButtonWrapper}
+        onPress={handleGoBack}
+      >
+        <Ionicons
+          name={"arrow-back-outline"}
+          color={colors.primary}
+          size={25}
+        />
       </TouchableOpacity>
       <View style={styles.textContainer}>
         <Text style={styles.headingText}>Let's get</Text>
@@ -92,7 +103,11 @@ const SignupScreen = () => {
       </View>
       <View style={styles.formContainer}>
         <View style={styles.inputContainer}>
-          <Ionicons name={"person-outline"} size={30} color={colors.secondary} />
+          <Ionicons
+            name={"person-outline"}
+            size={30}
+            color={colors.secondary}
+          />
           <TextInput
             style={styles.textInput}
             placeholder="Enter your full name"
@@ -101,7 +116,9 @@ const SignupScreen = () => {
             onChangeText={(text) => setFullName(text)}
           />
         </View>
-        {errors.fullName ? <Text style={styles.errorText}>{errors.fullName}</Text> : null}
+        {errors.fullName ? (
+          <Text style={styles.errorText}>{errors.fullName}</Text>
+        ) : null}
 
         <View style={styles.inputContainer}>
           <Ionicons name={"mail-outline"} size={30} color={colors.secondary} />
@@ -117,7 +134,11 @@ const SignupScreen = () => {
         {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
         <View style={styles.inputContainer}>
-          <SimpleLineIcons name={"lock"} size={30} color={colors.secondary} />
+          <SimpleLineIcons
+            name={"lock"}
+            size={30}
+            color={colors.secondary}
+          />
           <TextInput
             style={styles.textInput}
             placeholder="Enter your password"
@@ -131,12 +152,16 @@ const SignupScreen = () => {
               setSecureEntry((prev) => !prev);
             }}
           >
-            <SimpleLineIcons name={"eye"} size={20} color={colors.secondary} />
+            <SimpleLineIcons
+              name={"eye"}
+              size={20}
+              color={colors.secondary}
+            />
           </TouchableOpacity>
         </View>
-        {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
-
-       
+        {errors.password ? (
+          <Text style={styles.errorText}>{errors.password}</Text>
+        ) : null}
 
         <TouchableOpacity
           style={styles.loginButtonWrapper}

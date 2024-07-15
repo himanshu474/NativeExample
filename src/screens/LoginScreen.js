@@ -14,6 +14,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { colors } from "../utlis/colors";
 import TermsOfServiceScreen from "./TermsOfServiceScreen";
+import { login } from "../api/apiService";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -22,7 +23,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [loading, setLoading] = useState(false); // New state for loading indicator
+  const [loading, setLoading] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState("");
 
@@ -35,46 +36,44 @@ const LoginScreen = () => {
     setShowTermsModal(true);
   };
 
-  const handleLogin = () => {
+  const validateForm = () => {
+    let isValid = true;
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      isValid = false;
+    }
+    if (!password.trim()) {
+      setPasswordError("Password is required");
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const handleLogin = async () => {
     setEmailError("");
     setPasswordError("");
 
-    if (!validateEmail(email)) {
-      setEmailError("Please enter a valid email address");
+    if (!validateForm()) {
       return;
     }
 
-    if (!validatePassword(password)) {
-      setPasswordError("Password must be at least 6 characters long");
-      return;
+    setLoading(true);
+
+    try {
+      const user = await login(email, password);
+
+      if (user) {
+        // Navigate to MainApp with user data if login successful
+        navigation.navigate("MainApp", { user });
+      } else {
+        setPasswordError("Invalid email or password");
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setPasswordError("Error logging in, please try again");
+    } finally {
+      setLoading(false); // Ensure loading indicator is turned off
     }
-
-    setLoading(true); // Start loading indicator
-
-    // Simulate login process
-    setTimeout(() => {
-      setLoading(false); // Stop loading indicator
-
-      // Navigate to main app or handle error
-      navigation.navigate("MainApp");
-    }, 5); // Simulating 5 milliseconds of loading time
-
-    setEmail("")
-    setPassword("")
-  };
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePassword = (password) => {
-    return password.length >= 6;
-  };
-
-  const handleCloseModal = () => {
-    setShowTermsModal(false);
-    setSelectedPolicy("");
   };
 
   return (
@@ -97,6 +96,7 @@ const LoginScreen = () => {
           />
         </View>
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+
         <View style={styles.inputContainer}>
           <SimpleLineIcons name={"lock"} size={30} color={colors.secondary} />
           <TextInput
@@ -128,13 +128,6 @@ const LoginScreen = () => {
             >
               Terms of Service,
             </Text>
-            {/* <Text
-              style={styles.termsLink}
-              onPress={() => handleTermsPress("CookiePolicy")}
-            >
-              Cookie Policy,
-            </Text> */}
-            
           </Text>
         </TouchableOpacity>
 
@@ -155,7 +148,7 @@ const LoginScreen = () => {
             <Text style={styles.signupText}>Sign up</Text>
           </TouchableOpacity>
         </View>
-      </View> 
+      </View>
 
       <Modal
         animationType="slide"
@@ -166,12 +159,11 @@ const LoginScreen = () => {
         <View style={styles.modalContainer}>
           <TouchableOpacity
             style={styles.closeModalButton}
-            onPress={handleCloseModal}
+            onPress={() => setShowTermsModal(false)}
           >
             <Ionicons name="close-circle-outline" size={36} color={colors.primary} />
           </TouchableOpacity>
           {selectedPolicy === "TermsOfService" && <TermsOfServiceScreen />}
-          {/* {selectedPolicy === "CookiePolicy" && <CookiePolicyScreen />} */}
         </View>
       </Modal>
 
