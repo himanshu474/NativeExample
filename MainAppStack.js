@@ -1,21 +1,34 @@
-
-
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-// import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './src/screens/HomeScreen';
-import BottomTabNavigator from './src/Navigators/BottomTabNavigator'; // Assuming this is where your BottomTabNavigator is defined
+import BottomTabNavigator from './src/Navigators/BottomTabNavigator';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 const Stack = createStackNavigator();
-// const Tab = createBottomTabNavigator();
 
 const MainAppStack = () => {
   return (
     <Stack.Navigator initialRouteName="MainTabs" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
       <Stack.Screen name="Home" component={HomeScreen} />
-      {/* <Stack.Screen name="ProfileScreen" component={ProfileScreen} /> */}
-
+      {/* <Stack.Screen name="Profile" component={ProfileScreen}  /> */}
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          headerShown: true,
+          headerTitle: 'Profile',
+          headerBackTitleVisible: false,
+          headerLeft: () => (
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color="black"
+              style={{ marginLeft: 10 }}
+            />
+          ),
+        }}
+      />
     </Stack.Navigator>
   );
 };

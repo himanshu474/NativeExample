@@ -6,18 +6,23 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Modal
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../utlis/colors";
 import { signup } from "../api/apiService";
+import TermsOfServiceScreen from "./TermsOfServiceScreen";
+
 
 const SignupScreen = () => {
   const navigation = useNavigation();
   const [secureEntry, setSecureEntry] = useState(true);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [selectedPolicy, setSelectedPolicy] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({
     fullName: "",
@@ -31,6 +36,11 @@ const SignupScreen = () => {
 
   const handleLogin = () => {
     navigation.navigate("LOGIN");
+  };
+
+  const handleTermsPress = (policy) => {
+    setSelectedPolicy(policy);
+    setShowTermsModal(true);
   };
 
   const handleSignUp = async () => {
@@ -169,6 +179,33 @@ const SignupScreen = () => {
         >
           <Text style={styles.loginText}>Sign up</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.termsContainer}>
+          <Text style={styles.termsText}>
+            By continuing past this page, you agree to our{" "}
+            <Text
+              style={styles.termsLink}
+              onPress={() => handleTermsPress("TermsOfService")}
+            >
+              Terms of Service,
+            </Text>
+          </Text>
+        </TouchableOpacity>
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showTermsModal}
+        onRequestClose={() => setShowTermsModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <TouchableOpacity
+            style={styles.closeModalButton}
+            onPress={() => setShowTermsModal(false)}
+          >
+            <Ionicons name="close-circle-outline" size={36} color={colors.primary} />
+          </TouchableOpacity>
+          {selectedPolicy === "TermsOfService" && <TermsOfServiceScreen />}
+        </View>
+      </Modal>
 
         <Text style={styles.continueText}>or continue with</Text>
 
@@ -291,6 +328,36 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto",
     textDecorationLine: "underline",
     fontWeight: "900",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  closeModalButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
+    zIndex: 100,
+  },
+  termsContainer: {
+    alignItems: "flex-start",
+    marginTop: 10,
+    lineHeight: 10,
+  },
+  termsText: {
+    fontSize: 14,
+    fontFamily: "Roboto",
+    textAlign: "center",
+  },
+  termsLink: {
+    color: "blue",
+    fontWeight: "900",
+    textDecorationLine: "underline",
+    marginHorizontal: 5,
   },
 });
 

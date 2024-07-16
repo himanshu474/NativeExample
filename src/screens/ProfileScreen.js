@@ -4,18 +4,23 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../utlis/colors';
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const [name, setName] = useState('John Doe'); // State for the name input field
-  const [screenName, setScreenName] = useState('Profile'); // State for the screen name
+  const [name, setName] = useState('Himanshu Rawat');
+  const [updatedName, setUpdatedName] = useState(name); // State to track changes
+  const [isEditing, setIsEditing] = useState(false); // State to manage edit mode
 
   const handleLogout = () => {
     navigation.navigate('LOGIN');
   };
 
-  const handleSaveName = () => { 
-    setName(name);
+  const handleSaveName = () => {
+    setName(updatedName); // Update the name state
+    setIsEditing(false); // Exit edit mode
+  };
+
+  const handleEditName = () => {
+    setIsEditing(true); // Enter edit mode
   };
 
   return (
@@ -23,30 +28,32 @@ const ProfileScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>
           <Ionicons name={"arrow-back-outline"} color={colors.primary} size={25} />
-
-          </Text>
         </TouchableOpacity>
-        <Text style={styles.screenTitle}>{screenName}</Text>
+        <Text style={styles.screenTitle}>Profile</Text>
       </View>
 
+      {/* Editable profile name */}
       <View style={styles.profileInfo}>
-        {/* <Text style={styles.label}>Name: 
-        </Text> */}
-          <TextInput
+        <TextInput
           style={styles.input}
-          value={name}
-          onChangeText={setName}
+          value={updatedName}
+          onChangeText={setUpdatedName}
+          editable={isEditing} // Allow editing only when in edit mode
           placeholder="Enter your name"
         />
-       
-        <TouchableOpacity onPress={handleSaveName} style={styles.saveButton}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
+        {isEditing ? (
+          <TouchableOpacity onPress={handleSaveName} style={styles.saveButton}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={handleEditName} style={styles.editButton}>
+            <Text style={styles.editButtonText}>Edit Name</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
-      {/* Display name */}
+      {/* Display current name */}
       <View style={styles.displayNameContainer}>
         <Text style={styles.displayName}>Name: {name}</Text>
       </View>
@@ -87,13 +94,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  // label: {
-  // marginRight:200,
-  //   fontSize: 18,
-  //   fontFamily: 'Roboto',
-  //   color: colors.primary,
-  //   marginBottom: 10,
-  // },
   input: {
     borderWidth: 1,
     borderColor: colors.primary,
@@ -105,15 +105,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Roboto',
   },
-  // saveButton: {
-  //   marginTop: 10,
-  //   backgroundColor: colors.primary,
-  //   paddingVertical: 10,
-  //   paddingHorizontal: 20,
-  //   borderRadius: 5,
-  // },
+  saveButton: {
+    marginTop: 10,
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
   saveButtonText: {
     color: colors.white,
+    fontSize: 16,
+    fontFamily: 'Roboto',
+  },
+  editButton: {
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  editButtonText: {
+    color: colors.primary,
     fontSize: 16,
     fontFamily: 'Roboto',
   },

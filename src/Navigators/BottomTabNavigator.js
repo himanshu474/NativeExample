@@ -17,11 +17,9 @@ const BottomTabNavigator = () => {
           fontSize: 16,
           fontFamily: "Roboto",
         },
-        style:{
-          borderTopWidth:1,
-          borderTopColor:colors.secondary,
-        },
+       
       }}
+      
     >
       <Tab.Screen
         name="Home"
@@ -38,8 +36,10 @@ const BottomTabNavigator = () => {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle-outline" size={size} color={color} />
+            
           ),
         }}
+      
       />
     </Tab.Navigator>
   );

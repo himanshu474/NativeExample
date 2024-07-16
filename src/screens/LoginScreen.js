@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,50 +8,47 @@ import {
   StyleSheet,
   ActivityIndicator,
   Modal,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import { colors } from "../utlis/colors";
-import TermsOfServiceScreen from "./TermsOfServiceScreen";
-import { login } from "../api/apiService";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import { colors } from '../utlis/colors'; // Ensure your colors import path is correct
+import ForgotPasswordScreen from './ForgotPasswordScreen'; // Import the ForgotPasswordScreen component
+import { login } from '../api/apiService'; // Import your login function from API service
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [secureEntry, setSecureEntry] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  const [selectedPolicy, setSelectedPolicy] = useState("");
 
   const handleSignup = () => {
-    navigation.navigate("SIGNUP");
+    navigation.navigate('SIGNUP');
   };
 
-  const handleTermsPress = (policy) => {
-    setSelectedPolicy(policy);
-    setShowTermsModal(true);
+  const handleForgotPassword = () => {
+    navigation.navigate('FORGOT'); // Navigate to ForgotPasswordScreen
   };
 
   const validateForm = () => {
     let isValid = true;
     if (!email.trim()) {
-      setEmailError("Email is required");
+      setEmailError('Email is required');
       isValid = false;
     }
     if (!password.trim()) {
-      setPasswordError("Password is required");
+      setPasswordError('Password is required');
       isValid = false;
     }
     return isValid;
   };
 
   const handleLogin = async () => {
-    setEmailError("");
-    setPasswordError("");
+    setEmailError('');
+    setPasswordError('');
 
     if (!validateForm()) {
       return;
@@ -64,13 +61,13 @@ const LoginScreen = () => {
 
       if (user) {
         // Navigate to MainApp with user data if login successful
-        navigation.navigate("MainApp", { user });
+        navigation.navigate('MainApp', { user });
       } else {
-        setPasswordError("Invalid email or password");
+        setPasswordError('Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setPasswordError("Error logging in, please try again");
+      setPasswordError('Error logging in, please try again');
     } finally {
       setLoading(false); // Ensure loading indicator is turned off
     }
@@ -85,7 +82,7 @@ const LoginScreen = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Ionicons name={"mail-outline"} size={30} color={colors.secondary} />
+          <Ionicons name={'mail-outline'} size={30} color={colors.secondary} />
           <TextInput
             style={styles.textInput}
             placeholder="Enter your email"
@@ -98,7 +95,7 @@ const LoginScreen = () => {
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
         <View style={styles.inputContainer}>
-          <SimpleLineIcons name={"lock"} size={30} color={colors.secondary} />
+          <SimpleLineIcons name={'lock'} size={30} color={colors.secondary} />
           <TextInput
             style={styles.textInput}
             placeholder="Enter your password"
@@ -112,32 +109,23 @@ const LoginScreen = () => {
               setSecureEntry((prev) => !prev);
             }}
           >
-            <SimpleLineIcons name={"eye"} size={20} color={colors.secondary} />
+            <SimpleLineIcons name={'eye'} size={20} color={colors.secondary} />
           </TouchableOpacity>
         </View>
         {passwordError ? (
           <Text style={styles.errorText}>{passwordError}</Text>
         ) : null}
 
-        <TouchableOpacity style={styles.termsContainer}>
-          <Text style={styles.termsText}>
-            By continuing past this page, you agree to our{" "}
-            <Text
-              style={styles.termsLink}
-              onPress={() => handleTermsPress("TermsOfService")}
-            >
-              Terms of Service,
-            </Text>
-          </Text>
-        </TouchableOpacity>
-
         <TouchableOpacity onPress={handleLogin} style={styles.loginButtonWrapper}>
           <Text style={styles.loginText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPasswordWrapper}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
         <Text style={styles.continueText}>or continue with</Text>
         <TouchableOpacity style={styles.googleButtonContainer}>
           <Image
-            source={require("../assets/images/google.png")}
+            source={require('../assets/images/google.png')}
             style={styles.googleImage}
           />
           <Text style={styles.googleText}>Google</Text>
@@ -149,23 +137,6 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showTermsModal}
-        onRequestClose={() => setShowTermsModal(false)}
-      >
-        <View style={styles.modalContainer}>
-          <TouchableOpacity
-            style={styles.closeModalButton}
-            onPress={() => setShowTermsModal(false)}
-          >
-            <Ionicons name="close-circle-outline" size={36} color={colors.primary} />
-          </TouchableOpacity>
-          {selectedPolicy === "TermsOfService" && <TermsOfServiceScreen />}
-        </View>
-      </Modal>
 
       {loading && (
         <View style={styles.loadingOverlay}>
@@ -188,7 +159,7 @@ const styles = StyleSheet.create({
   headingText: {
     fontSize: 32,
     color: colors.primary,
-    fontFamily: "Roboto",
+    fontFamily: 'Roboto',
     marginStart: 10,
   },
   formContainer: {
@@ -199,18 +170,18 @@ const styles = StyleSheet.create({
     borderColor: colors.secondary,
     borderRadius: 100,
     paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 2,
     marginVertical: 10,
   },
   textInput: {
     flex: 1,
     paddingHorizontal: 10,
-    fontFamily: "Roboto",
+    fontFamily: 'Roboto',
   },
   errorText: {
-    color: "red",
+    color: 'red',
     marginTop: 5,
     marginLeft: 10,
   },
@@ -222,24 +193,24 @@ const styles = StyleSheet.create({
   loginText: {
     color: colors.white,
     fontSize: 20,
-    fontFamily: "Roboto",
-    textAlign: "center",
+    fontFamily: 'Roboto',
+    textAlign: 'center',
     padding: 10,
   },
   continueText: {
-    textAlign: "center",
+    textAlign: 'center',
     marginVertical: 20,
     fontSize: 14,
-    fontFamily: "Roboto",
+    fontFamily: 'Roboto',
     color: colors.primary,
   },
   googleButtonContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderWidth: 2,
     borderColor: colors.primary,
     borderRadius: 100,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 10,
     marginVertical: 10,
   },
@@ -249,60 +220,41 @@ const styles = StyleSheet.create({
   },
   googleText: {
     fontSize: 20,
-    fontFamily: "Roboto",
+    fontFamily: 'Roboto',
   },
   footerContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginVertical: 20,
     gap: 5,
   },
   accountText: {
     color: colors.primary,
-    fontFamily: "Roboto",
+    fontFamily: 'Roboto',
   },
   signupText: {
-    color: "blue",
-    fontFamily: "Roboto",
-    textDecorationLine: "underline",
-    fontWeight: "900",
+    color: 'blue',
+    fontFamily: 'Roboto',
+    textDecorationLine: 'underline',
+    fontWeight: '900',
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
+  forgotPasswordWrapper: {
+    alignItems:'flex-end',
+    marginVertical: 10,
+    marginRight:20,
   },
-  closeModalButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 10,
-    zIndex: 100,
-  },
-  termsContainer: {
-    alignItems: "flex-start",
-    marginTop: 10,
-    lineHeight: 10,
-  },
-  termsText: {
-    fontSize: 14,
-    fontFamily: "Roboto",
-    textAlign: "center",
-  },
-  termsLink: {
-    color: "blue",
-    fontWeight: "900",
-    textDecorationLine: "underline",
-    marginHorizontal: 5,
+  forgotPasswordText: {
+    color: 'blue',
+    fontFamily: 'Roboto',
+    textDecorationLine: 'underline',
+    fontWeight: '900',
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
