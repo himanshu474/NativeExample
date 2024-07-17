@@ -7,70 +7,94 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
-  Modal,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+
+import { login } from '../api/apiService'; // Adjust the path as per your file structure
 import { colors } from '../utlis/colors'; // Ensure your colors import path is correct
-import ForgotPasswordScreen from './ForgotPasswordScreen'; // Import the ForgotPasswordScreen component
-import { login } from '../api/apiService'; // Import your login function from API service
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [secureEntry, setSecureEntry] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleSignup = () => {
     navigation.navigate('SIGNUP');
   };
 
   const handleForgotPassword = () => {
-    navigation.navigate('FORGOT'); // Navigate to ForgotPasswordScreen
+    navigation.navigate('FORGOT');
   };
 
   const validateForm = () => {
     let isValid = true;
+
     if (!email.trim()) {
       setEmailError('Email is required');
       isValid = false;
+    } else if (!/^[a-zA-Z0-9._%+-]+@(gmail|hotmail|rediffmail|myitronline|Yahoo|msn)\.(com|in|co.in|xyz)$/.test(email)) {
+      setEmailError('Email is invalid');
+      isValid = false;
+    } else {
+      setEmailError('');
     }
+
     if (!password.trim()) {
       setPasswordError('Password is required');
       isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters long');
+      isValid = false;
+    } else {
+      setPasswordError('');
     }
     return isValid;
   };
 
   const handleLogin = async () => {
-    setEmailError('');
-    setPasswordError('');
-
     if (!validateForm()) {
+      showToast('Please fill all fields');
       return;
     }
 
     setLoading(true);
-
     try {
       const user = await login(email, password);
 
       if (user) {
-        // Navigate to MainApp with user data if login successful
+        await AsyncStorage.setItem('userData', JSON.stringify(user));
+        showToast('User successfully logged in');
         navigation.navigate('MainApp', { user });
       } else {
-        setPasswordError('Invalid email or password');
+        showToast('Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setPasswordError('Error logging in, please try again');
+      showToast('Error logging in, please try again');
     } finally {
-      setLoading(false); // Ensure loading indicator is turned off
+      setLoading(false);
     }
+
+    setEmail('');
+    setPassword('');
+  };
+
+  const showToast = (text) => {
+    Toast.show({
+      type: 'error',
+      text1: text,
+      position: 'top',
+      visibilityTime: 2000,
+      autoHide: true,
+    });
   };
 
   return (
@@ -89,7 +113,10 @@ const LoginScreen = () => {
             placeholderTextColor={colors.secondary}
             keyboardType="email-address"
             value={email}
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={(text) => {
+              setEmail(text);
+              setEmailError('');
+            }}
           />
         </View>
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
@@ -102,7 +129,10 @@ const LoginScreen = () => {
             placeholderTextColor={colors.secondary}
             secureTextEntry={secureEntry}
             value={password}
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={(text) => {
+              setPassword(text);
+              setPasswordError('');
+            }}
           />
           <TouchableOpacity
             onPress={() => {
@@ -112,17 +142,18 @@ const LoginScreen = () => {
             <SimpleLineIcons name={'eye'} size={20} color={colors.secondary} />
           </TouchableOpacity>
         </View>
-        {passwordError ? (
-          <Text style={styles.errorText}>{passwordError}</Text>
-        ) : null}
+        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
         <TouchableOpacity onPress={handleLogin} style={styles.loginButtonWrapper}>
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
+
         <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPasswordWrapper}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
+
         <Text style={styles.continueText}>or continue with</Text>
+
         <TouchableOpacity style={styles.googleButtonContainer}>
           <Image
             source={require('../assets/images/google.png')}
@@ -130,6 +161,7 @@ const LoginScreen = () => {
           />
           <Text style={styles.googleText}>Google</Text>
         </TouchableOpacity>
+
         <View style={styles.footerContainer}>
           <Text style={styles.accountText}>Don’t have an account?</Text>
           <TouchableOpacity onPress={handleSignup}>
@@ -143,6 +175,8 @@ const LoginScreen = () => {
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       )}
+
+      <Toast />
     </View>
   );
 };
@@ -163,7 +197,7 @@ const styles = StyleSheet.create({
     marginStart: 10,
   },
   formContainer: {
-    marginTop: 40,
+    marginTop: 30,
   },
   inputContainer: {
     borderWidth: 1,
@@ -179,11 +213,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 10,
     fontFamily: 'Roboto',
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 5,
-    marginLeft: 10,
   },
   loginButtonWrapper: {
     backgroundColor: colors.primary,
@@ -240,9 +269,9 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   forgotPasswordWrapper: {
-    alignItems:'flex-end',
+    alignItems: 'flex-end',
     marginVertical: 10,
-    marginRight:20,
+    marginRight: 20,
   },
   forgotPasswordText: {
     color: 'blue',
@@ -255,6 +284,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
+    fontFamily: 'Roboto',
+    fontSize: 12,
   },
 });
 

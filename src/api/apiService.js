@@ -9,7 +9,8 @@ export const login = async (email, password) => {
     if (response.status === 200 && response.data.length > 0) {
       return response.data[0];
     } else {
-      throw new Error('Invalid email or password');
+      // throw new Error('Invalid email or password');
+      console.log("error")
     }
   } catch (error) {
     console.error('Error logging in:', error.message);

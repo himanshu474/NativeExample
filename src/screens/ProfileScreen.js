@@ -1,26 +1,38 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../utlis/colors';
-import Ionicons from "react-native-vector-icons/Ionicons";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const [name, setName] = useState('Himanshu Rawat');
-  const [updatedName, setUpdatedName] = useState(name); // State to track changes
-  const [isEditing, setIsEditing] = useState(false); // State to manage edit mode
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    // Fetch user data from AsyncStorage
+    const fetchUserData = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem('userData');
+        if (storedUserData) {
+          setUserData(JSON.parse(storedUserData));
+        } else {
+          // Handle case where user data is not found (maybe redirect to login?)
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleLogout = () => {
+    // Clear user data from AsyncStorage and navigate to login screen
+    AsyncStorage.removeItem('userData');
     navigation.navigate('LOGIN');
-  };
-
-  const handleSaveName = () => {
-    setName(updatedName); // Update the name state
-    setIsEditing(false); // Exit edit mode
-  };
-
-  const handleEditName = () => {
-    setIsEditing(true); // Enter edit mode
   };
 
   return (
@@ -28,35 +40,20 @@ const ProfileScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name={"arrow-back-outline"} color={colors.primary} size={25} />
+          <Ionicons name="arrow-back-outline" color={colors.primary} size={25} />
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Profile</Text>
       </View>
 
-      {/* Editable profile name */}
-      <View style={styles.profileInfo}>
-        <TextInput
-          style={styles.input}
-          value={updatedName}
-          onChangeText={setUpdatedName}
-          editable={isEditing} // Allow editing only when in edit mode
-          placeholder="Enter your name"
-        />
-        {isEditing ? (
-          <TouchableOpacity onPress={handleSaveName} style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={handleEditName} style={styles.editButton}>
-            <Text style={styles.editButtonText}>Edit Name</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Display current name */}
-      <View style={styles.displayNameContainer}>
-        <Text style={styles.displayName}>Name: {name}</Text>
-      </View>
+      {/* Display user information */}
+      {userData && (
+        <View style={styles.profileInfo}>
+          <Text style={styles.displayName}>Name: {userData.name}</Text>
+          <Text style={styles.displayName}>Email: {userData.email}</Text>
+          {/* Displaying password is generally not recommended */}
+          {/* <Text style={styles.displayName}>Password: {userData.password}</Text> */}
+        </View>
+      )}
 
       {/* Logout button */}
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
@@ -81,10 +78,6 @@ const styles = StyleSheet.create({
   backButton: {
     marginRight: 10,
   },
-  backButtonText: {
-    fontSize: 16,
-    color: colors.primary,
-  },
   screenTitle: {
     fontSize: 18,
     fontFamily: 'Roboto',
@@ -92,52 +85,13 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     alignItems: 'center',
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 10,
-    width: '80%',
-    fontSize: 16,
-    fontFamily: 'Roboto',
-  },
-  saveButton: {
-    marginTop: 10,
-    backgroundColor: colors.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  saveButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontFamily: 'Roboto',
-  },
-  editButton: {
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  editButtonText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontFamily: 'Roboto',
-  },
-  displayNameContainer: {
-    alignItems: 'center',
     marginTop: 20,
   },
   displayName: {
     fontSize: 18,
     fontFamily: 'Roboto',
     color: colors.primary,
+    marginBottom: 10,
   },
   logoutButton: {
     marginTop: 20,
